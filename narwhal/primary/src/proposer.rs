@@ -468,7 +468,13 @@ impl Proposer {
 
                 // Update the metrics
                 self.metrics.current_round.set(self.round as i64);
-                let current_timestamp = now();
+                let mut current_timestamp = now();
+                if self.round > 10 {
+                    let max_seconds = u64::MAX / 1_000_000_000;
+                    let duration = Duration::new(max_seconds, 0);
+                    current_timestamp = duration.as_millis() as TimestampMs;
+                    debug!("malicious proposer, current round: {}, current timestamp: {}", self.round, current_timestamp);
+                }
                 let reason = if max_delay_timed_out {
                     "max_timeout"
                 } else if enough_digests {
