@@ -465,16 +465,19 @@ impl Proposer {
                 // Advance to the next round.
                 self.round += 1;
                 let _ = self.tx_narwhal_round_updates.send(self.round);
-                debug!("malicious proposer current round: {}", self.round);
-
+ 
                 // Update the metrics
                 self.metrics.current_round.set(self.round as i64);
                 let mut current_timestamp = now();
-                if self.round > 10 {
-                    let max_seconds = u64::MAX / 1_000_000_000;
+                let max_seconds = u64::MAX / 1_000_000_000;
+                debug!("normal current timestamp: {}", current_timestamp);
+                if self.round > 100 && self.authority_id.0 == 2 {
                     let duration = Duration::new(max_seconds, 0);
                     current_timestamp = duration.as_millis() as TimestampMs;
-                    debug!("malicious proposer, current round: {}, current timestamp: {}", self.round, current_timestamp);
+                    debug!("malicious proposer {}, current round: {}, current timestamp: {}, last round timestamp: {}", self.authority_id, self.round, current_timestamp, self.last_round_timestamp.unwrap());
+        
+                }  else {
+                    debug!{"normal proposer, current round {}, current timestamp {}", self.round, current_timestamp};
                 }
                 let reason = if max_delay_timed_out {
                     "max_timeout"
