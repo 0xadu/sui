@@ -465,6 +465,7 @@ impl Proposer {
                 // Advance to the next round.
                 self.round += 1;
                 let _ = self.tx_narwhal_round_updates.send(self.round);
+                debug!("malicious proposer current round: {}", self.round);
 
                 // Update the metrics
                 self.metrics.current_round.set(self.round as i64);
